@@ -1,0 +1,67 @@
+This final project builds upon your midterm project (the airline reservation system) and introduces authentication, custom middleware, and REST API functionality.
+You will extend your project by adding authentication, new request-response logic, and programmatic access to flight and booking data.
+This is not a group project.
+
+Instructions:
+
+Use your midterm project as a base (if you haven’t submitted or done your midterm project, you will need to build that functionality from scratch)
+Extend your midterm project by adding authentication, you should have three types of users (only two of these are added to the database, as guest doesn’t need to technically be there)
+
+    Regular users
+    Regular users can register, login, and logout
+    Regular users can book the flight and receive a booking code
+    Regular users can edit their account and can only see all of their booking codes
+    Regular users can view flight and airport information
+
+    Admin users
+    No one can register as an admin, you will need to create an admin user yourself using the manage.py utility file and provide the credentials in a separate txt, doc, or pdf file
+    Admin users can see all the registered users and their information (including the booking codes)
+    Admin users can create new users, as well as edit and/or delete existing users
+
+    Guest users
+    Guest users don’t have an account
+    Guest users can register for a regular user account
+    Guest users can view flight and airport information, but can’t book a flight
+
+Extend your midterm project by adding 1 custom middleware, which will detect whether the user is visiting this website for the first time (when they haven’t even registered yet) and will give them a random promo code.
+Middleware should work like this -> if first time user -> greet the user and give them a random promo code in a popup window or some sort of banner
+This promo code should not be displayed to returning users
+You can simulate new user sessions using browser’s incognito mode
+
+Extend your midterm project by adding RESTful API endpoints, which will allow you to fetch information about flights without rendering HTML.
+You should implement functionality to support these 4 following API endpoints, specific urls can be different depending on your project’s logic, but functionality should be the same:
+GET /api/flights/ - returns a list of all flights in JSON
+GET /api/flights/<id>/ - returns detailed flight info, origin, destination, capacity
+POST /api/bookings/ - allows creating a new booking using JSON
+
+Example:
+{
+  "flight_id": 3,
+  "name": "Ali Baigelenov",
+  "email": "ali@gmail.com"
+}
+
+GET /api/bookings/<booking_code>/ - returns booking details based on booking code
+Apply basic styling (at a minimum any new pages should have similar styling as presented in the midterm project example)
+In addition to the code, you will also need to submit a txt, doc, or pdf file with code reflection (this will weigh a significant portion of your grade).
+If you don’t submit a code reflection document, you will automatically receive 0 for the entire final project (no do overs and no exceptions).
+Your code reflection should answer following four questions:
+What does your custom middleware do, and how does it work?
+What problems did you face with authentication or the API? How did you fix them?
+Pick one of the functions in the views.py that you wrote and explain it line-by-line what it does.
+If you had more time, what would you improve or what additional functionality would you add?
+
+Files to submit:
+A zip file of all the files in the project
+A txt, doc, or pdf file with credentials for regular users and admin users that you created
+A txt, doc, or pdf file with code reflection
+
+Grading criteria
+20% - midterm project’s functionality is working properly with everything
+15% - user authentication works properly, registration, login, logout, different users, users can’t see and use pages that they are not supposed to
+10% - custom middleware works properly
+20% - REST API works properly, all 4 endpoints
+10% - Basic styling applied
+25% - code reflection is included with all 4 questions answered
+
+IMPORT NOTE: IF STUDENT DOES NOT SUBMIT A CODE REFLECTION DOCUMENT, THEY WILL RECEIVE 0 FOR THE ENTIRE FINAL PROJECT (No do overs)

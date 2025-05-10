@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lagrange Airlines</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #121212; /* Darker background */
+            color: white;
+            text-align: center;
+        }
+        .container {
+            margin-top: 15vh; /* Push everything down */
+        }
+        .welcome-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .nav-card {
+            background-color: #1f1f1f; /* Dark card */
+            padding: 15px 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 250px;
+            transition: 0.3s;
+        }
+        .nav-card:hover {
+            background-color: #292929;
+            transform: scale(1.05);
+        }
+        .nav-card a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="welcome-text">Welcome to Lagrange Airlines</div>
+    <div class="nav-links">
+        <div class="nav-card"><a href="{% url 'flights' %}">Flights</a></div>
+        <div class="nav-card"><a href="{% url 'manage-booking' %}">Manage Booking</a></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

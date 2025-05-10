@@ -1,0 +1,56 @@
+In this midterm project, you will build a Django-based airline reservation system.
+The app will store information about airports, flights, passengers, and bookings.
+Users will be able to view flights, book a flight using a unique booking code, and manage their reservations without authentication.
+This is not a group project.
+
+Instructions:
+Create a Django project called airline_system
+Inside the project, create an app called flights.
+
+Define models
+
+Airport model: 3-letter airport code and city name
+Flight model: origin, destination (both foreign keys to Airport), duration (in minutes), and capacity
+Passenger model: passenger name and email address
+Booking model: passenger (foreign key to Passenger), flight (foreign key to Flight), booking_code (needs to be unique, hint: can use uuid for this)
+
+Populate the database using Django ORM in the shell
+Create at least 10 airports and 20 flights
+
+
+
+
+There needs to be several pages at a minimum:
+Index page - displays all the flights, users need to be able to click on a flight to view more details and book it,
+need to be able to click on an airport to see all the arriving and departing flights for that airport, and needs to be able to check their booking via the unique code
+
+Flight page - displays information about the flight such as capacity and all the booked passengers for that flight,
+need to have a button/link to book the flight, capacity needs to change when a new passenger books the flight
+
+Booking page - has a form that takes user’s name and email address as an input and goes to the booking confirmation page after you submit the form
+
+Booking confirmation page - shows the unique booking code that can be used in the manage booking page
+
+Manage booking page - has a form that takes booking code as input, if the code is correct shows the flight info (name, email, flight, duration, booking code),
+if code is not correct sends them to an error page that says their code is incorrect
+
+Airport page - displays information about a particular airport, all of its arriving and departing flights
+
+Apply basic styling (at a minimum it needs to look like the example)
+
+
+
+
+
+
+
+Files to submit:
+A zip file of all the files in the project
+
+Grading criteria
+15% - Correct Django setup, proper models with relationships
+10% - 10 airports and 20 flights created using ORM
+20% - Flight booking system works, capacity updates, unique booking codes generated
+15% - All pages function correctly, URLs are properly set up
+10% - Basic styling applied
+30% - Presentation, clear explanation of the code and logic, students can present only if they submit their code before the deadline to Moodle (10 minute presentation limit)
