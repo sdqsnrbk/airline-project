@@ -3,6 +3,8 @@ import uuid
 import string
 import random
 
+from django.contrib.auth.models import User
+
 class Airport(models.Model):
     code = models.CharField(max_length=3, unique=True)
     city = models.CharField(max_length=100)
@@ -31,7 +33,7 @@ class Booking(models.Model):
     passenger = models.ForeignKey(Passenger, on_delete=models.CASCADE)
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     unique_booking_code = models.CharField(max_length=6, unique=True, editable=False)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='bookings')
     def save(self, *args, **kwargs):
         if not self.unique_booking_code:
             self.unique_booking_code = self.generate_unique_booking_code()

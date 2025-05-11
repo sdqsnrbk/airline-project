@@ -1,0 +1,58 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Logged Out - Airline System</title>
+        {% load static %}
+        <style>
+            /* Similar basic styling */
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f0f2f5;
+                color: #333;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                text-align: center;
+            }
+            .container {
+                background-color: #fff;
+                padding: 30px 40px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                width: 100%;
+                max-width: 450px;
+                box-sizing: border-box;
+            }
+            h2 {
+                color: #1d3557;
+                margin-bottom: 20px;
+            }
+            p {
+                margin-bottom: 20px;
+                font-size: 1.1em;
+            }
+            a {
+                color: #007bff;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>You have been logged out.</h2>
+            <p>Thank you for visiting!</p>
+            <p><a href="{% url 'login' %}">Log In Again</a></p>
+            <p><a href="{% url 'index' %}">Back to Home</a></p>
+        </div>
+    </body>
+    </html>
+    

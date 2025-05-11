@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title|default:"Register" }} - Airline System</title>
+    {% load static %}
+    <style>
+        /* Basic Styling for the form - consider moving to a separate CSS file */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5; /* Light grey background */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px; /* Max width for the form container */
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #1d3557; /* Dark blue */
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057; /* Grey text for labels */
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da; /* Light grey border */
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue glow on focus */
+            outline: none;
+        }
+        .helptext {
+            font-size: 0.85em;
+            color: #6c757d; /* Muted grey for help text */
+            margin-top: 6px;
+            display: block;
+        }
+        ul.errorlist {
+            list-style-type: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+            color: #dc3545; /* Red for errors */
+            font-size: 0.85em;
+        }
+        button[type="submit"] {
+            background-color: #007bff; /* Primary blue */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s ease;
+            margin-top: 10px;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        .messages li {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        .messages li.success {
+            background-color: #d1e7dd; /* Green for success */
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+        .messages li.error {
+            background-color: #f8d7da; /* Red for errors */
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+        .messages li.info {
+            background-color: #cff4fc; /* Blue for info */
+            color: #055160;
+            border: 1px solid #b6effb;
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9em;
+        }
+        .auth-links p {
+            margin-bottom: 8px;
+        }
+        .auth-links a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{{ title|default:"Create an Account" }}</h2>
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text|safe }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="errorlist">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit">Register</button>
+        </form>
+        <div class="auth-links">
+            <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+            <p><a href="{% url 'index' %}">Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>

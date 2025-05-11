@@ -1,0 +1,166 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login - Airline System</title>
+        {% load static %}
+        <style>
+            /* Same styling as register.html for consistency */
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f0f2f5;
+                color: #333;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
+            .container {
+                background-color: #fff;
+                padding: 30px 40px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                width: 100%;
+                max-width: 450px;
+                box-sizing: border-box;
+            }
+            h2 {
+                text-align: center;
+                color: #1d3557;
+                margin-bottom: 25px;
+                font-weight: 600;
+            }
+            .form-group {
+                margin-bottom: 20px;
+            }
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #495057;
+            }
+            input[type="text"],
+            input[type="password"] {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ced4da;
+                border-radius: 6px;
+                box-sizing: border-box;
+                font-size: 1rem;
+                transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+            input[type="text"]:focus,
+            input[type="password"]:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                outline: none;
+            }
+            ul.errorlist { /* For form errors */
+                list-style-type: none;
+                padding: 0;
+                margin: 8px 0 0 0;
+                color: #dc3545;
+                font-size: 0.85em;
+            }
+            .form-non-field-errors .errorlist li { /* For non-field errors like "invalid credentials" */
+                 background-color: #f8d7da;
+                 color: #721c24;
+                 padding: 10px;
+                 border-radius: 4px;
+                 margin-bottom: 15px;
+            }
+            button[type="submit"] {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: 500;
+                width: 100%;
+                transition: background-color 0.2s ease;
+                margin-top: 10px;
+            }
+            button[type="submit"]:hover {
+                background-color: #0056b3;
+            }
+            .messages {
+                list-style: none;
+                padding: 0;
+                margin-bottom: 20px;
+            }
+            .messages li {
+                padding: 12px 15px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+                font-size: 0.95em;
+            }
+            .messages li.success {
+                background-color: #d1e7dd;
+                color: #0f5132;
+                border: 1px solid #badbcc;
+            }
+            .messages li.error { /* For general messages, not form errors */
+                background-color: #f8d7da;
+                color: #842029;
+                border: 1px solid #f5c2c7;
+            }
+            .auth-links {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.9em;
+            }
+            .auth-links p {
+                margin-bottom: 8px;
+            }
+            .auth-links a {
+                color: #007bff;
+                text-decoration: none;
+            }
+            .auth-links a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Login</h2>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="form-non-field-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <p class="errorlist">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit">Login</button>
+            </form>
+            <div class="auth-links">
+                <p>Need an account? <a href="{% url 'register' %}">Register here</a></p>
+                <p><a href="{% url 'index' %}">Back to Home</a></p>
+            </div>
+        </div>
+    </body>
+    </html>
+    
