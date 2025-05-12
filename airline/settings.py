@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'flights.middleware.PromoCodeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -130,3 +131,20 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'index' # Or any other URL name you want to redirect to after login
+
+LOGIN_URL = 'login'
+
+# In settings.py
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication', # BasicAuth is often included by default too
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # Sets default permission. AllowAny allows access unless view overrides.
+        # Or use IsAuthenticatedOrReadOnly, IsAuthenticated etc. as a base default.
+        'rest_framework.permissions.AllowAny',
+    ]
+    # You might add other settings like pagination here later
+}

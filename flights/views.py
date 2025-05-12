@@ -4,16 +4,17 @@ from django.contrib import messages
 from .models import Flight, Booking, Passenger, Airport # Your existing model imports
 
 # Imports for authentication and forms
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required # Ensure this is imported
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .forms import UserRegisterForm, UserUpdateForm # UserUpdateForm is for profile_edit
+from .forms import UserRegisterForm, UserUpdateForm
 
+# ... (index, flights, flight_details, airport views) ...
 def index(request):
     return render(request, 'index.html')
 
 def flights(request):
-    flights_list = Flight.objects.all() # Renamed to avoid conflict with the function name
+    flights_list = Flight.objects.all()
     return render(request, 'flights.html', {'flights': flights_list})
 
 def flight_details(request, flight_id):
@@ -21,7 +22,7 @@ def flight_details(request, flight_id):
     return render(request, 'flight_details.html', {'flight': flight})
 
 def airport(request, airport_id):
-    airport_obj = get_object_or_404(Airport, id=airport_id) # Renamed to avoid conflict
+    airport_obj = get_object_or_404(Airport, id=airport_id)
     arriving_flights = Flight.objects.filter(destination=airport_obj)
     departing_flights = Flight.objects.filter(origin=airport_obj)
     return render(request, 'airport.html', {
@@ -30,69 +31,115 @@ def airport(request, airport_id):
         'departing_flights': departing_flights
     })
 
+
+@login_required # Protects the booking page
 def booking_page(request, flight_id):
     flight = get_object_or_404(Flight, id=flight_id)
 
-    # NOTE: This view will need to be updated in Phase 2 to handle authenticated users
     if request.method == "POST":
-        name = request.POST.get('name')
-        email = request.POST.get('email')
+        user = request.user
+        passenger_name = f"{user.first_name} {user.last_name}".strip()
+        passenger_email = user.email
 
-        if not name or not email:
-            messages.error(request, 'Name and email are required!') # Using messages framework
-            return render(request, 'booking.html', {'flight': flight})
+        if not passenger_name or not passenger_email:
+            messages.error(request, 'Your profile is incomplete (missing name or email). Please update your profile.')
+            return redirect('profile_edit')
 
-        # This passenger creation logic will change.
-        # For now, it creates a new Passenger object for each booking.
-        # Later, if a user is logged in, we'll link to their User object.
         passenger, created = Passenger.objects.get_or_create(
-            email=email, defaults={'name': name}
+            email=passenger_email,
+            defaults={'name': passenger_name}
         )
-        if not created and passenger.name != name: # If email exists with different name, update name or handle as error
-            passenger.name = name # Or decide on a different strategy
+        if not created and passenger.name != passenger_name:
+            passenger.name = passenger_name
             passenger.save()
 
-
-        booking = Booking.objects.create(
+        current_booking = Booking.objects.create(
             passenger=passenger,
-            flight=flight
-            # user=request.user if request.user.is_authenticated else None # This will be added later
+            flight=flight,
+            user=user
         )
-        messages.success(request, f"Booking confirmed! Your booking code is {booking.unique_booking_code}.")
-        return redirect('booking_confirmation', booking_code=booking.unique_booking_code)
+        messages.success(request, f"Booking confirmed for {passenger_name}! Your booking code is {current_booking.unique_booking_code}.")
+        return redirect('booking_confirmation', booking_code=current_booking.unique_booking_code)
 
-    return render(request, 'booking.html', {'flight': flight})
+    context = {
+        'flight': flight,
+        'user_full_name': f"{request.user.first_name} {request.user.last_name}".strip(),
+        'user_email': request.user.email
+    }
+    return render(request, 'booking.html', context)
 
+@login_required # Added protection
 def booking_confirmation(request, booking_code):
-    booking = get_object_or_404(Booking, unique_booking_code=booking_code)
+    # Use select_related to fetch related user, passenger, flight, origin, destination in one query
+    booking = get_object_or_404(
+        Booking.objects.select_related(
+            'user', 'passenger', 'flight', 'flight__origin', 'flight__destination'
+        ),
+        unique_booking_code=booking_code
+    )
+    # Ensure only the user who booked or an admin can see this
+    if not request.user.is_staff and booking.user != request.user:
+         messages.error(request, "You do not have permission to view this booking.")
+         # Redirect to 'my_bookings' page once it exists, or index for now
+         return redirect('index') # CHANGE LATER: redirect('manage_booking') would be better
     return render(request, 'confirmation.html', {'booking': booking})
 
+@login_required
 def manage_booking(request):
-    # This view might also need updates based on user authentication later
+    """
+    Handles displaying a list of the user's bookings (GET)
+    and looking up a specific booking by code (POST).
+    """
+    user_bookings = None
+    searched_booking = None
+    search_attempted = False
+
+    # Handle POST request (lookup specific booking code)
     if request.method == "POST":
+        search_attempted = True # Flag that a search was done
         booking_code = request.POST.get('booking_code')
-        if not booking_code: # Basic validation
+        if not booking_code:
             messages.error(request, "Please enter a booking code.")
-            return redirect('manage_booking')
+            # Fetch user's bookings even if POST fails, to display the list
+            user_bookings = Booking.objects.filter(user=request.user).select_related(
+                'passenger', 'flight', 'flight__origin', 'flight__destination'
+            ).order_by('-id') # Order by most recent first
+            return render(request, 'manage_booking.html', {'user_bookings': user_bookings, 'searched': search_attempted})
 
         try:
-            booking = Booking.objects.get(unique_booking_code__iexact=booking_code) # Case-insensitive lookup
-            # Add logic here to check if the logged-in user is allowed to see this booking
+            # Use select_related for efficiency
+            booking = Booking.objects.select_related(
+                'user', 'passenger', 'flight', 'flight__origin', 'flight__destination'
+            ).get(unique_booking_code__iexact=booking_code)
+
+            # Ensure only the user who booked or an admin can see this
+            if not request.user.is_staff and booking.user != request.user:
+                messages.error(request, "You do not have permission to view this booking code.")
+            else:
+                # Booking found and authorized
+                searched_booking = booking
         except Booking.DoesNotExist:
-            booking = None
-
-        if not booking:
             messages.error(request, "Invalid booking code.")
-            return redirect('manage_booking') # Redirect back to the form
 
-        return render(request, 'manage_booking.html', {'booking': booking, 'searched': True})
+        # If search failed or unauthorized, searched_booking remains None
+        if not searched_booking:
+             messages.info(request, f"Could not find details for booking code: {booking_code}")
 
-    return render(request, 'manage_booking.html', {'searched': False})
+    # For both GET requests and after POST requests, fetch the list of user's bookings
+    user_bookings = Booking.objects.filter(user=request.user).select_related(
+        'passenger', 'flight', 'flight__origin', 'flight__destination'
+    ).order_by('-id') # Order by most recent first
 
+    context = {
+        'user_bookings': user_bookings,
+        'searched_booking': searched_booking, # Result of the POST search (if any)
+        'searched': search_attempted # Flag to indicate if a search was performed via POST
+    }
+    return render(request, 'manage_booking.html', context)
+
+
+# ... (register view) ...
 def register(request):
-    """
-    Handles user registration.
-    """
     if request.user.is_authenticated:
         messages.info(request, "You are already logged in.")
         return redirect('index')
@@ -107,44 +154,37 @@ def register(request):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = UserRegisterForm()
+        form = UserRegisterForm() # Corrected: Was missing ()
     return render(request, 'register.html', {'form': form, 'title': 'Register'})
 
-@login_required # Ensures only logged-in users can access this view
+# ... (profile_edit view) ...
+@login_required
 def profile_edit(request):
-    """
-    Handles displaying and processing forms for a user to edit their profile
-    (email) and change their password. Username, first name, last name are read-only.
-    """
     if request.method == 'POST':
-        # Check which form was submitted based on the button's name attribute
         if 'update_profile' in request.POST:
             profile_form = UserUpdateForm(request.POST, instance=request.user)
-            # Initialize password_form to display it correctly even if profile_form is invalid
             password_form = PasswordChangeForm(request.user)
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, 'Your profile has been updated successfully!')
-                return redirect('profile_edit') # Redirect to the same page
+                return redirect('profile_edit')
             else:
                 messages.error(request, 'Please correct the profile errors below.')
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
-            # Initialize profile_form to display it correctly if password_form is invalid
             profile_form = UserUpdateForm(instance=request.user)
             if password_form.is_valid():
                 user = password_form.save()
-                update_session_auth_hash(request, user)  # Important! Keeps the user logged in.
+                update_session_auth_hash(request, user)
                 messages.success(request, 'Your password was successfully updated!')
-                return redirect('profile_edit') # Redirect to the same page
+                return redirect('profile_edit')
             else:
                 messages.error(request, 'Please correct the password errors below.')
         else:
-            # This case should ideally not be reached if buttons have proper names
             profile_form = UserUpdateForm(instance=request.user)
             password_form = PasswordChangeForm(request.user)
             messages.error(request, 'Invalid form submission. Please try again.')
-    else: # GET request
+    else:
         profile_form = UserUpdateForm(instance=request.user)
         password_form = PasswordChangeForm(request.user)
 

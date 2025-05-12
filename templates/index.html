@@ -7,32 +7,30 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #121212; /* Darker background */
+            background-color: #121212;
             color: white;
-            /* text-align: center; Removed to allow auth bar to align right */
-            margin: 0; /* Ensure no default margin */
-            padding: 0; /* Ensure no default padding */
+            margin: 0;
+            padding: 0;
         }
-        /* Styles for the authentication bar */
         .auth-bar {
-            background-color: #1f1f1f; /* Dark card color for consistency */
-            padding: 10px 20px; /* Padding around the auth bar content */
-            text-align: right; /* Aligns content (username, buttons) to the right */
-            border-bottom: 1px solid #000; /* Subtle border */
-            margin-bottom: 20px; /* Space before the main content */
+            background-color: #1f1f1f;
+            padding: 10px 20px;
+            text-align: right;
+            border-bottom: 1px solid #000;
+            /* Removed margin-bottom to let promo banner control spacing */
         }
         .auth-bar span {
-            margin-right: 15px; /* Space between "Hello, username!" and logout button */
+            margin-right: 15px;
             font-weight: bold;
         }
         .auth-bar a, .auth-bar button {
             color: white;
             text-decoration: none;
-            margin-left: 15px; /* Space between links/buttons */
+            margin-left: 15px;
             font-weight: bold;
         }
         .auth-bar button {
-            background-color: #007bff; /* Bootstrap primary blue for login/register like feel */
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 8px 15px;
@@ -41,54 +39,44 @@
             font-size: 0.9rem;
         }
         .auth-bar button.logout-btn {
-             background-color: #dc3545; /* Red for logout */
+             background-color: #dc3545;
         }
+        .auth-bar a.profile-link { /* Style for profile link if needed */ }
         .auth-bar a:hover, .auth-bar button:hover {
-            color: #adb5bd; /* Lighter color on hover */
+            color: #adb5bd;
         }
-
-        /* Original styles for the main content */
-        .container {
-            margin-top: 5vh; /* Adjusted margin-top */
-            text-align: center; /* Re-apply text-align center for main container */
-        }
-        .welcome-text {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        .nav-card {
-            background-color: #1f1f1f; /* Dark card */
-            padding: 15px 40px;
-            border-radius: 10px;
-            text-align: center;
-            width: 250px;
-            transition: 0.3s;
-        }
-        .nav-card:hover {
-            background-color: #292929;
-            transform: scale(1.05);
-        }
-        .nav-card a {
-            text-decoration: none;
+        /* Styles for the Promo Code Banner */
+        .promo-banner {
+            background-color: #198754; /* Bootstrap success green */
             color: white;
-            font-size: 1.2rem;
+            text-align: center;
+            padding: 10px 15px;
             font-weight: bold;
-            display: block;
+            margin-bottom: 20px; /* Space below banner */
         }
+        .promo-banner strong {
+            border: 1px dashed white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-family: monospace; /* Make code look distinct */
+        }
+        .container {
+            margin-top: 5vh;
+            text-align: center;
+        }
+        .welcome-text { font-size: 2rem; font-weight: bold; margin-bottom: 30px; }
+        .nav-links { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .nav-card { background-color: #1f1f1f; padding: 15px 40px; border-radius: 10px; text-align: center; width: 250px; transition: 0.3s; }
+        .nav-card:hover { background-color: #292929; transform: scale(1.05); }
+        .nav-card a { text-decoration: none; color: white; font-size: 1.2rem; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
-
     <div class="auth-bar">
         {% if user.is_authenticated %}
             <span>Hello, {{ user.username }}!</span>
+            <a href="{% url 'profile_edit' %}" class="profile-link">Edit Account</a>
             <form method="post" action="{% url 'logout' %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="logout-btn">Logout</button>
@@ -99,6 +87,12 @@
         {% endif %}
     </div>
 
+    {% if request.promo_code %}
+        <div class="promo-banner">
+            🎉 Welcome! Your first-time visit promo code: <strong>{{ request.promo_code }}</strong>
+        </div>
+    {% endif %}
+
     <div class="container">
         <div class="welcome-text">Welcome to Lagrange Airlines</div>
         <div class="nav-links">
@@ -106,7 +100,6 @@
             <div class="nav-card"><a href="{% url 'manage-booking' %}">Manage Booking</a></div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
